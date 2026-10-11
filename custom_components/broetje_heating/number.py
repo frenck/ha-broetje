@@ -37,6 +37,9 @@ async def async_setup_entry(
     entities: list[BroetjeNumber] = []
 
     for entity_key, entity_config in coordinator.numbers.items():
+        sub_device = entity_config.get("sub_device")
+        if sub_device is not None and sub_device not in coordinator.active_sub_devices:
+            continue
         entities.append(
             BroetjeNumber(
                 coordinator=coordinator,
@@ -62,6 +65,7 @@ class BroetjeNumber(BroetjeEntity, NumberEntity):
             coordinator,
             entity_key,
             zone_number=entity_config.get("zone_number"),
+            sub_device=entity_config.get("sub_device"),
         )
 
         self._register_key = entity_config["register"]

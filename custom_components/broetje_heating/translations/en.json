@@ -1174,6 +1174,41 @@
       "relative_power": {
         "name": "Relative power"
       },
+      "buffer_temp_bottom": {
+        "name": "Buffer temperature bottom"
+      },
+      "buffer_temp_top": {
+        "name": "Buffer temperature top"
+      },
+      "buffer_mode": {
+        "name": "Buffer tank mode",
+        "state": {
+          "decoupling_tank": "Decoupling tank",
+          "storage_tank": "Storage tank"
+        }
+      },
+      "buffer_heat_demand_power": {
+        "name": "Buffer tank heat demand power"
+      },
+      "buffer_heat_demand_setpoint": {
+        "name": "Buffer tank heat demand setpoint"
+      },
+      "buffer_heat_demand_type": {
+        "name": "Buffer tank heat demand type",
+        "state": {
+          "none": "None",
+          "dhw_primary": "DHW primary",
+          "dhw_high_priority": "DHW high priority",
+          "process_heat": "Process heat",
+          "screed_drying": "Screed drying",
+          "dhw_medium_priority": "DHW medium priority",
+          "dhw_low_priority": "DHW low priority",
+          "central_heating": "Central heating",
+          "cooling": "Cooling",
+          "electrical_active": "Electrical active",
+          "electrical_reactive": "Electrical reactive"
+        }
+      },
       "power_setpoint": {
         "name": "Power setpoint"
       },
@@ -1728,6 +1763,9 @@
       "error_present": {
         "name": "Error present"
       },
+      "buffer_pump_state": {
+        "name": "Buffer tank pump"
+      },
       "zone_pump": {
         "name": "Zone {zone} pump"
       },
@@ -1757,6 +1795,27 @@
       }
     },
     "number": {
+      "buffer_hysteresis_start": {
+        "name": "Buffer tank hysteresis start"
+      },
+      "buffer_hysteresis_stop": {
+        "name": "Buffer tank hysteresis stop"
+      },
+      "buffer_pump_post_run": {
+        "name": "Buffer tank pump post-run"
+      },
+      "buffer_fixed_setpoint_heating": {
+        "name": "Buffer tank fixed setpoint (heating)"
+      },
+      "buffer_fixed_setpoint_cooling": {
+        "name": "Buffer tank fixed setpoint (cooling)"
+      },
+      "buffer_slope": {
+        "name": "Buffer tank heating curve slope"
+      },
+      "buffer_setpoint_offset": {
+        "name": "Buffer tank setpoint offset"
+      },
       "zone_dhw_comfort_setpoint": {
         "name": "Zone {zone} DHW comfort setpoint"
       },
@@ -1780,6 +1839,14 @@
       }
     },
     "select": {
+      "buffer_control_strategy": {
+        "name": "Buffer tank control strategy",
+        "state": {
+          "fixed_setpoint": "Fixed setpoint",
+          "calculated_setpoint": "Calculated setpoint",
+          "dedicated_slope": "Dedicated slope"
+        }
+      },
       "dhw_eco_comfort_mode": {
         "name": "DHW mode",
         "state": {
