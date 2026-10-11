@@ -12,6 +12,7 @@ DEFAULT_SCAN_INTERVAL: Final = 120
 # Configuration keys
 CONF_UNIT_ID: Final = "unit_id"
 CONF_SCAN_INTERVAL: Final = "scan_interval"
+CONF_DEBUG_REGISTER_ACCESS: Final = "debug_register_access"
 
 # Manufacturer info
 MANUFACTURER: Final = "Brötje"
@@ -44,3 +45,14 @@ SCALE_CURVE: Final = 1 / 50  # 0.02 - for heating curve slope
 SCALE_POWER: Final = 1 / 10  # 0.1 - for power in kW
 SCALE_PERCENT_100: Final = 1 / 100  # 0.01 - for percentages scaled by 100
 SCALE_HOURS: Final = 1 / 3600  # for hours stored as seconds
+
+# Debug register access services (raw Modbus read/write, bypasses register_map)
+SERVICE_READ_REGISTER: Final = "debug_read_register"
+SERVICE_WRITE_REGISTER: Final = "debug_write_register"
+ATTR_CONFIG_ENTRY_ID: Final = "config_entry_id"
+ATTR_ADDRESS: Final = "address"
+ATTR_COUNT: Final = "count"
+ATTR_REGISTER_TYPE: Final = "register_type"
+ATTR_DATA_TYPE: Final = "data_type"
+ATTR_VALUES: Final = "values"
+ATTR_CONFIRM: Final = "confirm"

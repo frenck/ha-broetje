@@ -619,6 +619,61 @@ class BroetjeModbusCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         await self.async_request_refresh()
 
+    async def async_debug_read_registers(
+        self, address: int, count: int, register_type: str
+    ) -> list[int]:
+        """Read raw register word(s) directly by address.
+
+        Bypasses the register_map entirely: no decoding, scaling, or
+        validation against known registers is applied. For the
+        debug_read_register service only.
+        """
+        result = await self._read_registers(address, count, register_type)
+        if result is None:
+            raise HomeAssistantError(
+                f"Failed to read {count} {register_type} register(s) "
+                f"at address {address}"
+            )
+        return result
+
+    async def async_debug_write_registers(
+        self, address: int, values: list[int]
+    ) -> list[int]:
+        """Write raw register word(s) directly by address.
+
+        DANGER: bypasses the register_map entirely — no writable flag,
+        bounds checking, or scaling is applied. Writing an unexpected value
+        to the wrong address can put the heat pump into an undefined or
+        unsafe state. For the debug_write_register service only.
+        """
+        _LOGGER.warning(
+            "DEBUG WRITE: writing raw values %s to holding register address %d",
+            values,
+            address,
+        )
+        async with self._lock:
+            try:
+                await self._connect()
+
+                result = await self._client.write_registers(
+                    address=address, values=values, device_id=self._unit_id
+                )
+
+                if result.isError():
+                    raise HomeAssistantError(
+                        f"Modbus write error at address {address}: {result}"
+                    )
+
+            except ModbusException as err:
+                await self._disconnect()
+                raise HomeAssistantError(
+                    f"Modbus exception writing address {address}: {err}"
+                ) from err
+
+        readback = await self._read_registers(address, len(values), REG_HOLDING)
+        await self.async_request_refresh()
+        return readback if readback is not None else []
+
     async def async_shutdown(self) -> None:
         """Shutdown the coordinator."""
         await self._disconnect()

@@ -82,10 +82,12 @@
         "title": "Allgemeine Einstellungen",
         "description": "Abfrage- und Integrationseinstellungen anpassen.",
         "data": {
-          "scan_interval": "Abfrageintervall (Sekunden)"
+          "scan_interval": "Abfrageintervall (Sekunden)",
+          "debug_register_access": "Debug-Registerzugriff (GEFAHR)"
         },
         "data_description": {
-          "scan_interval": "Wie oft das Modbus-Gerät nach aktualisierten Werten abgefragt wird (10-3600 Sekunden)."
+          "scan_interval": "Wie oft das Modbus-Gerät nach aktualisierten Werten abgefragt wird (10-3600 Sekunden).",
+          "debug_register_access": "Aktiviert die Aktionen debug_read_register und debug_write_register für dieses Gerät. Diese Aktionen umgehen alle Sicherheitsprüfungen und können beliebige Werte in beliebige Modbus-Register schreiben. Nur aktivieren, wenn Sie genau wissen, was Sie tun."
         }
       },
       "zone_config": {
@@ -1793,6 +1795,56 @@
           "scheduling": "Zeitprogramm",
           "manual": "Manuell",
           "off": "Aus"
+        }
+      }
+    }
+  },
+  "services": {
+    "debug_read_register": {
+      "name": "GEFAHR: Modbus-Register roh lesen",
+      "description": "Liest rohe Register-W\u00f6rter direkt \u00fcber die Adresse, ohne jegliche Validierung gegen bekannte Register. Nur zur Diagnose undokumentierter Register. Muss zuvor pro Ger\u00e4t in den Integrationsoptionen aktiviert werden.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Ger\u00e4t",
+          "description": "Der Br\u00f6tje-Heizung-Konfigurationseintrag, von dem gelesen werden soll."
+        },
+        "address": {
+          "name": "Adresse",
+          "description": "Modbus-Registeradresse (0-65535)."
+        },
+        "count": {
+          "name": "Anzahl",
+          "description": "Anzahl der aufeinanderfolgenden zu lesenden Register (1-125). Standard: 1."
+        },
+        "register_type": {
+          "name": "Registertyp",
+          "description": "Holding- oder Input-Register. Standard: holding."
+        },
+        "data_type": {
+          "name": "Datentyp",
+          "description": "Wie das Ergebnis zur Anzeige dekodiert wird (raw, uint16, int16, uint32, int32, string). Standard: raw."
+        }
+      }
+    },
+    "debug_write_register": {
+      "name": "GEFAHR: Modbus-Register roh schreiben",
+      "description": "Schreibt rohe Register-W\u00f6rter direkt \u00fcber die Adresse, ohne JEGLICHE Sicherheitspr\u00fcfung (kein Schreibbar-Flag, keine Grenzwert- oder Skalierungspr\u00fcfung). Das Schreiben eines falschen Werts an die falsche Adresse kann die W\u00e4rmepumpe in einen unsicheren oder undefinierten Zustand versetzen. Muss zuvor pro Ger\u00e4t in den Integrationsoptionen aktiviert werden.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Ger\u00e4t",
+          "description": "Der Br\u00f6tje-Heizung-Konfigurationseintrag, auf den geschrieben werden soll."
+        },
+        "address": {
+          "name": "Adresse",
+          "description": "Modbus-Holding-Registeradresse (0-65535)."
+        },
+        "values": {
+          "name": "Werte",
+          "description": "Liste roher 16-Bit-Register-W\u00f6rter zum Schreiben (je 0-65535), beginnend bei Adresse."
+        },
+        "confirm": {
+          "name": "Ich verstehe das Risiko",
+          "description": "Muss auf true gesetzt werden, um den Schreibvorgang durchzuf\u00fchren. Dies ist eine Sicherheitssperre, keine Sicherheitsfunktion."
         }
       }
     }
