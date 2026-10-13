@@ -10,6 +10,7 @@ from typing import Any, Final
 from ..const import (
     REG_HOLDING,
     SUBDEV_BOILER,
+    SUBDEV_BUFFER_TANK,
     SUBDEV_HYBRID,
     SUBDEV_SERVICE,
 )
@@ -142,6 +143,24 @@ IWR_STATIC_ENTITY_CLASSIFICATION: Final[dict[str, tuple[str | None, bool]]] = {
     "board3_error_severity": ("diagnostic", False),
     "board4_error_code": ("diagnostic", False),
     "board4_error_severity": ("diagnostic", False),
+    # ===== Buffer Tank (Excel parameterlist) — Primary =====
+    "buffer_temp_bottom": (None, True),
+    "buffer_temp_top": (None, True),
+    "buffer_pump_state": (None, True),
+    "buffer_mode": (None, True),
+    # ===== Buffer Tank — Diagnostic, enabled =====
+    "buffer_heat_demand_power": ("diagnostic", True),
+    "buffer_heat_demand_setpoint": ("diagnostic", True),
+    "buffer_heat_demand_type": ("diagnostic", True),
+    "buffer_control_strategy": ("diagnostic", True),
+    # ===== Buffer Tank tuning parameters — Diagnostic, disabled by default =====
+    "buffer_hysteresis_start": ("diagnostic", False),
+    "buffer_hysteresis_stop": ("diagnostic", False),
+    "buffer_pump_post_run": ("diagnostic", False),
+    "buffer_fixed_setpoint_heating": ("diagnostic", False),
+    "buffer_fixed_setpoint_cooling": ("diagnostic", False),
+    "buffer_slope": ("diagnostic", False),
+    "buffer_setpoint_offset": ("diagnostic", False),
 }
 
 # Zone entity classification keyed by translation_key (zone-number-agnostic).
@@ -499,6 +518,34 @@ IWR_DHW_ECO_COMFORT: Final = {
     1: "comfort_hp_boiler",
 }
 
+# Buffer tank control strategy (register 7503, BP002)
+IWR_BUFFER_CONTROL_STRATEGY: Final = {
+    0: "fixed_setpoint",
+    1: "calculated_setpoint",
+    2: "dedicated_slope",
+}
+
+# Buffer tank mode (register 7603, BM020)
+IWR_BUFFER_MODE: Final = {
+    0: "decoupling_tank",
+    1: "storage_tank",
+}
+
+# Buffer tank winning heat demand type (register 7606)
+IWR_BUFFER_HEAT_DEMAND_TYPE: Final = {
+    0: "none",
+    1: "dhw_primary",
+    2: "dhw_high_priority",
+    3: "process_heat",
+    4: "screed_drying",
+    5: "dhw_medium_priority",
+    6: "dhw_low_priority",
+    7: "central_heating",
+    8: "cooling",
+    9: "electrical_active",
+    10: "electrical_reactive",
+}
+
 # Collected enum maps for IWR device
 IWR_ENUM_MAPS: Final = {
     "iwr_main_status": IWR_MAIN_STATUS,
@@ -519,6 +566,9 @@ IWR_ENUM_MAPS: Final = {
     "iwr_heating_control_strategy": IWR_HEATING_CONTROL_STRATEGY,
     "iwr_time_program_selected": IWR_TIME_PROGRAM_SELECTED,
     "iwr_dhw_eco_comfort": IWR_DHW_ECO_COMFORT,
+    "iwr_buffer_control_strategy": IWR_BUFFER_CONTROL_STRATEGY,
+    "iwr_buffer_mode": IWR_BUFFER_MODE,
+    "iwr_buffer_heat_demand_type": IWR_BUFFER_HEAT_DEMAND_TYPE,
 }
 
 # ===== Zone Address Tables =====
@@ -1329,6 +1379,121 @@ _IWR_STATIC_REGISTER_MAP: Final = {
         "data_type": "uint16",
         "scale": 1,
     },
+    # --- Buffer Tank (Excel parameterlist GTW-08-Modbus-parameterlijst.xlsx) ---
+    "buffer_hysteresis_start": {
+        "address": 7500,
+        "type": REG_HOLDING,
+        "count": 1,
+        "data_type": "int16",
+        "scale": IWR_SCALE_TEMP,
+        "writable": True,
+    },
+    "buffer_hysteresis_stop": {
+        "address": 7501,
+        "type": REG_HOLDING,
+        "count": 1,
+        "data_type": "int16",
+        "scale": IWR_SCALE_TEMP,
+        "writable": True,
+    },
+    "buffer_pump_post_run": {
+        "address": 7502,
+        "type": REG_HOLDING,
+        "count": 1,
+        "data_type": "uint16",
+        "scale": 1,
+        "writable": True,
+    },
+    "buffer_control_strategy": {
+        "address": 7503,
+        "type": REG_HOLDING,
+        "count": 1,
+        "data_type": "uint16",
+        "scale": 1,
+        "writable": True,
+        "min": 0,
+        "max": 2,
+    },
+    "buffer_fixed_setpoint_heating": {
+        "address": 7504,
+        "type": REG_HOLDING,
+        "count": 1,
+        "data_type": "uint16",
+        "scale": IWR_SCALE_TEMP,
+        "writable": True,
+    },
+    "buffer_fixed_setpoint_cooling": {
+        "address": 7505,
+        "type": REG_HOLDING,
+        "count": 1,
+        "data_type": "uint16",
+        "scale": IWR_SCALE_TEMP,
+        "writable": True,
+    },
+    "buffer_slope": {
+        "address": 7506,
+        "type": REG_HOLDING,
+        "count": 1,
+        "data_type": "uint16",
+        "scale": 0.1,
+        "writable": True,
+    },
+    "buffer_setpoint_offset": {
+        "address": 7507,
+        "type": REG_HOLDING,
+        "count": 1,
+        "data_type": "uint16",
+        "scale": IWR_SCALE_TEMP,
+        "writable": True,
+    },
+    "buffer_temp_bottom": {
+        "address": 7600,
+        "type": REG_HOLDING,
+        "count": 1,
+        "data_type": "int16",
+        "scale": IWR_SCALE_TEMP,
+    },
+    "buffer_temp_top": {
+        "address": 7601,
+        "type": REG_HOLDING,
+        "count": 1,
+        "data_type": "int16",
+        "scale": IWR_SCALE_TEMP,
+    },
+    "buffer_pump_state": {
+        "address": 7602,
+        "type": REG_HOLDING,
+        "count": 1,
+        "data_type": "bool",
+    },
+    "buffer_mode": {
+        "address": 7603,
+        "type": REG_HOLDING,
+        "count": 1,
+        "data_type": "uint16",
+        "scale": 1,
+    },
+    "buffer_heat_demand_power": {
+        "address": 7604,
+        "type": REG_HOLDING,
+        "count": 1,
+        "data_type": "uint16",
+        "scale": 1,
+    },
+    "buffer_heat_demand_setpoint": {
+        "address": 7605,
+        "type": REG_HOLDING,
+        "count": 1,
+        "data_type": "int16",
+        "scale": IWR_SCALE_TEMP,
+    },
+    "buffer_heat_demand_type": {
+        "address": 7606,
+        "type": REG_HOLDING,
+        "count": 1,
+        "data_type": "uint16",
+        "scale": 1,
+    },
 }
 
 # ===== Static Sensor Definitions =====
@@ -2049,6 +2214,60 @@ _IWR_STATIC_SENSORS: Final = {
         "enum_map": "iwr_error_severity",
         "sub_device": SUBDEV_SERVICE,
     },
+    # ===== Buffer Tank (Excel parameterlist) =====
+    "buffer_temp_bottom": {
+        "register": "buffer_temp_bottom",
+        "translation_key": "buffer_temp_bottom",
+        "device_class": "temperature",
+        "unit": "°C",
+        "state_class": "measurement",
+        "sub_device": SUBDEV_BUFFER_TANK,
+    },
+    "buffer_temp_top": {
+        "register": "buffer_temp_top",
+        "translation_key": "buffer_temp_top",
+        "device_class": "temperature",
+        "unit": "°C",
+        "state_class": "measurement",
+        "sub_device": SUBDEV_BUFFER_TANK,
+    },
+    "buffer_mode": {
+        "register": "buffer_mode",
+        "translation_key": "buffer_mode",
+        "device_class": "enum",
+        "unit": None,
+        "state_class": None,
+        "icon": "mdi:propane-tank-outline",
+        "enum_map": "iwr_buffer_mode",
+        "sub_device": SUBDEV_BUFFER_TANK,
+    },
+    "buffer_heat_demand_power": {
+        "register": "buffer_heat_demand_power",
+        "translation_key": "buffer_heat_demand_power",
+        "device_class": None,
+        "unit": "%",
+        "state_class": "measurement",
+        "icon": "mdi:gauge",
+        "sub_device": SUBDEV_BUFFER_TANK,
+    },
+    "buffer_heat_demand_setpoint": {
+        "register": "buffer_heat_demand_setpoint",
+        "translation_key": "buffer_heat_demand_setpoint",
+        "device_class": "temperature",
+        "unit": "°C",
+        "state_class": "measurement",
+        "sub_device": SUBDEV_BUFFER_TANK,
+    },
+    "buffer_heat_demand_type": {
+        "register": "buffer_heat_demand_type",
+        "translation_key": "buffer_heat_demand_type",
+        "device_class": "enum",
+        "unit": None,
+        "state_class": None,
+        "icon": "mdi:fire-circle",
+        "enum_map": "iwr_buffer_heat_demand_type",
+        "sub_device": SUBDEV_BUFFER_TANK,
+    },
 }
 
 # ===== Static Binary Sensor Definitions =====
@@ -2219,6 +2438,13 @@ _IWR_STATIC_BINARY_SENSORS: Final = {
         "translation_key": "error_present",
         "device_class": "problem",
         "sub_device": SUBDEV_SERVICE,
+    },
+    # --- Buffer Tank (Excel parameterlist) ---
+    "buffer_pump_state": {
+        "register": "buffer_pump_state",
+        "translation_key": "buffer_pump_state",
+        "device_class": "running",
+        "sub_device": SUBDEV_BUFFER_TANK,
     },
 }
 
@@ -3346,6 +3572,72 @@ def _build_board_sensors() -> dict[str, Any]:
 
 # ===== Writable Entity Builders =====
 
+# Static (non-zone) number entities for the IWR device.
+_IWR_STATIC_NUMBERS: Final[dict[str, Any]] = {
+    # BP014 - Hysteresis to start buffer loading (register 7500, R/W)
+    "buffer_hysteresis_start": {
+        "register": "buffer_hysteresis_start",
+        "translation_key": "buffer_hysteresis_start",
+        "device_class": "temperature",
+        "unit": "°C",
+        "mode": "box",
+        "sub_device": SUBDEV_BUFFER_TANK,
+    },
+    # BP019 - Hysteresis to stop buffer tank loading (register 7501, R/W)
+    "buffer_hysteresis_stop": {
+        "register": "buffer_hysteresis_stop",
+        "translation_key": "buffer_hysteresis_stop",
+        "device_class": "temperature",
+        "unit": "°C",
+        "mode": "box",
+        "sub_device": SUBDEV_BUFFER_TANK,
+    },
+    # BP015 - Minimum post-run duration of the buffer tank pump (register 7502, R/W)
+    "buffer_pump_post_run": {
+        "register": "buffer_pump_post_run",
+        "translation_key": "buffer_pump_post_run",
+        "unit": "min",
+        "mode": "box",
+        "icon": "mdi:pump",
+        "sub_device": SUBDEV_BUFFER_TANK,
+    },
+    # BP003 - Fixed setpoint requested by buffer tank in heating mode (register 7504, R/W)
+    "buffer_fixed_setpoint_heating": {
+        "register": "buffer_fixed_setpoint_heating",
+        "translation_key": "buffer_fixed_setpoint_heating",
+        "device_class": "temperature",
+        "unit": "°C",
+        "mode": "box",
+        "sub_device": SUBDEV_BUFFER_TANK,
+    },
+    # BP004 - Fixed setpoint requested by buffer tank in cooling mode (register 7505, R/W)
+    "buffer_fixed_setpoint_cooling": {
+        "register": "buffer_fixed_setpoint_cooling",
+        "translation_key": "buffer_fixed_setpoint_cooling",
+        "device_class": "temperature",
+        "unit": "°C",
+        "mode": "box",
+        "sub_device": SUBDEV_BUFFER_TANK,
+    },
+    # BP005 - Buffer tank heating curve slope (register 7506, R/W)
+    "buffer_slope": {
+        "register": "buffer_slope",
+        "translation_key": "buffer_slope",
+        "mode": "box",
+        "icon": "mdi:chart-line",
+        "sub_device": SUBDEV_BUFFER_TANK,
+    },
+    # BP013 - Offset added to the calculated setpoint (register 7507, R/W)
+    "buffer_setpoint_offset": {
+        "register": "buffer_setpoint_offset",
+        "translation_key": "buffer_setpoint_offset",
+        "device_class": "temperature",
+        "unit": "°C",
+        "mode": "box",
+        "sub_device": SUBDEV_BUFFER_TANK,
+    },
+}
+
 
 def _build_zone_numbers(zones: list[int]) -> dict[str, Any]:
     """Generate number entity definitions for writable numeric zone registers."""
@@ -3436,6 +3728,14 @@ _IWR_STATIC_SELECTS: Final[dict[str, Any]] = {
         "enum_map": "iwr_dhw_eco_comfort",
         "icon": "mdi:water-boiler",
         "sub_device": SUBDEV_HYBRID,
+    },
+    # BP002 - Heating/Cooling control strategy used with buffer tank (register 7503, R/W)
+    "buffer_control_strategy": {
+        "register": "buffer_control_strategy",
+        "translation_key": "buffer_control_strategy",
+        "enum_map": "iwr_buffer_control_strategy",
+        "icon": "mdi:tune-variant",
+        "sub_device": SUBDEV_BUFFER_TANK,
     },
 }
 
@@ -3539,7 +3839,7 @@ def get_iwr_device_config(zones: list[int] | None = None) -> dict[str, Any]:
         **_IWR_STATIC_BINARY_SENSORS,
         **_build_zone_binary_sensors(zones),
     }
-    numbers = _build_zone_numbers(zones)
+    numbers = {**_IWR_STATIC_NUMBERS, **_build_zone_numbers(zones)}
     selects = {**_IWR_STATIC_SELECTS, **_build_zone_selects(zones)}
     climates = _build_zone_climates(zones)
 

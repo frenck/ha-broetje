@@ -1174,6 +1174,41 @@
       "relative_power": {
         "name": "Relative Leistung"
       },
+      "buffer_temp_bottom": {
+        "name": "Puffertemperatur unten"
+      },
+      "buffer_temp_top": {
+        "name": "Puffertemperatur oben"
+      },
+      "buffer_mode": {
+        "name": "Pufferspeicher-Modus",
+        "state": {
+          "decoupling_tank": "Trennspeicher",
+          "storage_tank": "Schichtenspeicher"
+        }
+      },
+      "buffer_heat_demand_power": {
+        "name": "Pufferspeicher Wärmeanforderung Leistung"
+      },
+      "buffer_heat_demand_setpoint": {
+        "name": "Pufferspeicher Wärmeanforderung Sollwert"
+      },
+      "buffer_heat_demand_type": {
+        "name": "Pufferspeicher Wärmeanforderungstyp",
+        "state": {
+          "none": "Keine",
+          "dhw_primary": "TWW primär",
+          "dhw_high_priority": "TWW hohe Priorität",
+          "process_heat": "Prozesswärme",
+          "screed_drying": "Estrichtrocknung",
+          "dhw_medium_priority": "TWW mittlere Priorität",
+          "dhw_low_priority": "TWW niedrige Priorität",
+          "central_heating": "Heizung",
+          "cooling": "Kühlung",
+          "electrical_active": "Elektrisch aktiv",
+          "electrical_reactive": "Elektrisch reaktiv"
+        }
+      },
       "power_setpoint": {
         "name": "Leistungssollwert"
       },
@@ -1728,6 +1763,9 @@
       "error_present": {
         "name": "Fehler vorhanden"
       },
+      "buffer_pump_state": {
+        "name": "Pufferspeicherpumpe"
+      },
       "zone_pump": {
         "name": "Heizkreis {zone} Pumpe"
       },
@@ -1757,6 +1795,27 @@
       }
     },
     "number": {
+      "buffer_hysteresis_start": {
+        "name": "Pufferspeicher Hysterese Ladebeginn"
+      },
+      "buffer_hysteresis_stop": {
+        "name": "Pufferspeicher Hysterese Ladeende"
+      },
+      "buffer_pump_post_run": {
+        "name": "Pufferspeicherpumpe Nachlaufzeit"
+      },
+      "buffer_fixed_setpoint_heating": {
+        "name": "Pufferspeicher fester Sollwert (Heizen)"
+      },
+      "buffer_fixed_setpoint_cooling": {
+        "name": "Pufferspeicher fester Sollwert (Kühlen)"
+      },
+      "buffer_slope": {
+        "name": "Pufferspeicher Heizkurve Steilheit"
+      },
+      "buffer_setpoint_offset": {
+        "name": "Pufferspeicher Sollwert-Offset"
+      },
       "zone_dhw_comfort_setpoint": {
         "name": "Heizkreis {zone} TWW Komfortsollwert"
       },
@@ -1780,6 +1839,14 @@
       }
     },
     "select": {
+      "buffer_control_strategy": {
+        "name": "Pufferspeicher Regelstrategie",
+        "state": {
+          "fixed_setpoint": "Fester Sollwert",
+          "calculated_setpoint": "Berechneter Sollwert",
+          "dedicated_slope": "Eigene Heizkurve"
+        }
+      },
       "dhw_eco_comfort_mode": {
         "name": "Warmwasser-Modus",
         "state": {
