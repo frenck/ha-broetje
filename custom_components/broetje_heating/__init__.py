@@ -11,10 +11,12 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers.typing import ConfigType
 
 from .const import CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL, SUB_DEVICE_LABELS
 from .coordinator import BroetjeModbusCoordinator
 from .devices import CONF_DEVICE_TYPE, DeviceType
+from .services import async_setup_services
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -27,6 +29,12 @@ PLATFORMS: list[Platform] = [
 ]
 
 type BroetjeConfigEntry = ConfigEntry[BroetjeModbusCoordinator]
+
+
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    """Set up the Brötje Heatpump integration (register debug services)."""
+    async_setup_services(hass)
+    return True
 
 
 async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:

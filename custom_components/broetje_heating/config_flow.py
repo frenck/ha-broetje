@@ -21,6 +21,7 @@ from homeassistant.helpers.selector import (
 )
 
 from .const import (
+    CONF_DEBUG_REGISTER_ACCESS,
     CONF_SCAN_INTERVAL,
     CONF_UNIT_ID,
     DEFAULT_PORT,
@@ -201,6 +202,9 @@ class BroetjeOptionsFlow(OptionsFlow):
         current_interval = self.config_entry.options.get(
             CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
         )
+        current_debug_access = self.config_entry.options.get(
+            CONF_DEBUG_REGISTER_ACCESS, False
+        )
 
         return self.async_show_form(
             step_id="general",
@@ -209,6 +213,9 @@ class BroetjeOptionsFlow(OptionsFlow):
                     vol.Required(CONF_SCAN_INTERVAL, default=current_interval): vol.All(
                         int, vol.Range(min=10, max=3600)
                     ),
+                    vol.Required(
+                        CONF_DEBUG_REGISTER_ACCESS, default=current_debug_access
+                    ): bool,
                 }
             ),
         )

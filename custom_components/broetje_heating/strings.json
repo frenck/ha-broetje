@@ -82,10 +82,12 @@
         "title": "General Settings",
         "description": "Adjust polling and integration settings.",
         "data": {
-          "scan_interval": "Scan interval (seconds)"
+          "scan_interval": "Scan interval (seconds)",
+          "debug_register_access": "Debug register access (DANGER)"
         },
         "data_description": {
-          "scan_interval": "How often to poll the Modbus device for updated values (10-3600 seconds)."
+          "scan_interval": "How often to poll the Modbus device for updated values (10-3600 seconds).",
+          "debug_register_access": "Enables the debug_read_register and debug_write_register actions for this device. These actions bypass all safety checks and can write arbitrary values to arbitrary Modbus registers. Only enable this if you know what you are doing."
         }
       },
       "zone_config": {
@@ -1581,6 +1583,56 @@
           "scheduling": "Scheduling",
           "manual": "Manual",
           "off": "Off"
+        }
+      }
+    }
+  },
+  "services": {
+    "debug_read_register": {
+      "name": "DANGER: Read raw Modbus register",
+      "description": "Reads raw register word(s) directly by address, bypassing all known-register validation. For diagnosing undocumented registers only. Must be enabled per-device in the integration options first.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Device",
+          "description": "The Br\u00f6tje Heating config entry to read from."
+        },
+        "address": {
+          "name": "Address",
+          "description": "Modbus register address (0-65535)."
+        },
+        "count": {
+          "name": "Count",
+          "description": "Number of consecutive registers to read (1-125). Default: 1."
+        },
+        "register_type": {
+          "name": "Register type",
+          "description": "Holding or input register. Default: holding."
+        },
+        "data_type": {
+          "name": "Data type",
+          "description": "How to decode the result for display (raw, uint16, int16, uint32, int32, string). Default: raw."
+        }
+      }
+    },
+    "debug_write_register": {
+      "name": "DANGER: Write raw Modbus register",
+      "description": "Writes raw register word(s) directly by address, bypassing ALL safety checks (no writable flag, bounds, or scaling validation). Writing the wrong value to the wrong address can put the heat pump into an unsafe or undefined state. Must be enabled per-device in the integration options first.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Device",
+          "description": "The Br\u00f6tje Heating config entry to write to."
+        },
+        "address": {
+          "name": "Address",
+          "description": "Modbus holding register address (0-65535)."
+        },
+        "values": {
+          "name": "Values",
+          "description": "List of raw 16-bit register word(s) to write (each 0-65535), starting at Address."
+        },
+        "confirm": {
+          "name": "I understand the risk",
+          "description": "Must be set to true to perform the write. This is a safety gate, not a security feature."
         }
       }
     }
